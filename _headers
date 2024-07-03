@@ -1,0 +1,8 @@
+/
+  Cache-Control: public, max-age=31536000
+
+/script.js
+  Cache-Control: public, max-age=31536000
+
+/robots.txt
+  Cache-Control: no-cache, no-store, must-revalidate
