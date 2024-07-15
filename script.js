@@ -1,4 +1,4 @@
-const API_URL = 'https://proxy.velyn.workers.dev/?cors=*&url=https%3A%2F%2Fhk4e-launcher-static.hoyoverse.com%2Fhk4e_global%2Fmdk%2Flauncher%2Fapi%2Fresource%3Fchannel_id%3D1%26key%3DgcStgarh%26launcher_id%3D10%26sub_channel_id%3D0';
+const API_URL = 'https://proxy.velyn.workers.dev/?cors=*&url=https%3A%2F%2Fsg-hyp-api.hoyoverse.com%2Fhyp%2Fhyp-connect%2Fapi%2FgetGamePackages%3Fgame_ids%5B%5D%3DgopR6Cufr3%26launcher_id%3DVYTpXlbWo8';
 
 const KB = 1024;
 const MB = 1024 * KB;
@@ -31,46 +31,53 @@ function formatLanguage(lang) {
     }
 }
 
+function formatName(url) {
+    const parts = url.split('/');
+    return parts[parts.length - 1];
+}
+
 fetch(API_URL)
     .then(response => response.json())
     .then(json => {
         const divPreGame = document.getElementById('pre-game');
         const divGame = document.getElementById('game');
 
-        const preGame = json.data.pre_download_game;
-        const game = json.data.game;
+        const preGame = json.data.game_packages[0].pre_download;
+        const game = json.data.game_packages[0].main;
 
         if (preGame) {
-            preGame.diffs.forEach(function(diff, i) {
+            preGame.patches.forEach(function(diff, i) {
                 const div = document.createElement('div');
                 div.id = `pg-${i+1}`;
                 divPreGame.appendChild(div);
 
                 const ver = document.createElement('h2');
-                ver.textContent = `Pre-Update Version ${diff.version} to ${preGame.latest.version}`;
+                ver.textContent = `Pre-Update Version ${diff.version} to ${preGame.major.version}`;
                 div.appendChild(ver);
 
+                const game_data = diff.game_pkgs[0];
+
                 const name = document.createElement('h3');
-                name.textContent = `Game Data (${formatBytes(diff.package_size)})`;
+                name.textContent = `Game Data (${formatBytes(game_data.size)})`;
                 div.appendChild(name);
 
                 const download = document.createElement('a');
-                download.textContent = diff.name;
-                download.href = diff.path;
+                download.textContent = formatName(game_data.url);
+                download.href = game_data.url;
                 div.appendChild(download);
 
                 const hash = document.createElement('p');
-                hash.textContent = `MD5 : ${diff.md5}`;
+                hash.textContent = `MD5 : ${game_data.md5}`;
                 div.appendChild(hash);
 
-                diff.voice_packs.forEach(voice => {
+                diff.audio_pkgs.forEach(voice => {
                     const name = document.createElement('h3');
-                    name.textContent = `${formatLanguage(voice.language)} Voice (${formatBytes(voice.package_size)})`;
+                    name.textContent = `${formatLanguage(voice.language)} Voice (${formatBytes(voice.size)})`;
                     div.appendChild(name);
 
                     const download = document.createElement('a');
-                    download.textContent = voice.name;
-                    download.href = voice.path;
+                    download.textContent = formatName(voice.url);
+                    download.href = voice.url;
                     div.appendChild(download);
 
                     const hash = document.createElement('p');
@@ -86,36 +93,38 @@ fetch(API_URL)
         }
 
         if (game) {
-            game.diffs.forEach(function(diff, i) {
+            game.patches.forEach(function(diff, i) {
                 const div = document.createElement('div');
                 div.id = `g-${i+1}`;
                 divGame.appendChild(div);
 
                 const ver = document.createElement('h2');
-                ver.textContent = `Update Version ${diff.version} to ${game.latest.version}`;
+                ver.textContent = `Update Version ${diff.version} to ${game.major.version}`;
                 div.appendChild(ver);
 
+                const game_data = diff.game_pkgs[0];
+
                 const name = document.createElement('h3');
-                name.textContent = `Game Data (${formatBytes(diff.package_size)})`;
+                name.textContent = `Game Data (${formatBytes(game_data.size)})`;
                 div.appendChild(name);
 
                 const download = document.createElement('a');
-                download.textContent = diff.name;
-                download.href = diff.path;
+                download.textContent = formatName(game_data.url);
+                download.href = game_data.url;
                 div.appendChild(download);
 
                 const hash = document.createElement('p');
-                hash.textContent = `MD5 : ${diff.md5}`;
+                hash.textContent = `MD5 : ${game_data.md5}`;
                 div.appendChild(hash);
 
-                diff.voice_packs.forEach(voice => {
+                diff.audio_pkgs.forEach(voice => {
                     const name = document.createElement('h3');
-                    name.textContent = `${formatLanguage(voice.language)} Voice (${formatBytes(voice.package_size)})`;
+                    name.textContent = `${formatLanguage(voice.language)} Voice (${formatBytes(voice.size)})`;
                     div.appendChild(name);
 
                     const download = document.createElement('a');
-                    download.textContent = voice.name;
-                    download.href = voice.path;
+                    download.textContent = formatName(voice.url);
+                    download.href = voice.url;
                     div.appendChild(download);
 
                     const hash = document.createElement('p');
